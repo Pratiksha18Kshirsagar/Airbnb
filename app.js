@@ -22,6 +22,19 @@ const passport = require("passport");
 const LocalStratergy = require("passport-local");
 const User = require("./models/user.js");
 
+
+const dbUrl = process.env.ATLASDB_URL;
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    crypto: {
+        secret: process.env.SECRET,
+        touchAfter:24*3600,
+      }
+  })
+  //to handel session error
+  store.on("error" , (err)=>{
+    console.log("error in mongo session store" , err);
+  });
 const sessionOptions = {
     store,
     secret: process.env.SECRET,
@@ -34,19 +47,9 @@ const sessionOptions = {
     }
 }
 
-const dbUrl = process.env.ATLASDB_URL;
 
-const store = MongoStore.create({
-    mongoUrl: dbUrl,
-    crypto: {
-        secret: process.env.SECRET,
-        touchAfter:24*3600,
-      }
-  })
-  //to handel session error
-  store.on("error" , (err)=>{
-    console.log("error in mongo session store" , err);
-  });
+
+
 
 app.use(session(sessionOptions));
 app.use(flash());
